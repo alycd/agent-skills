@@ -1,0 +1,116 @@
+{
+  "id": "draw-io",
+  "name": "Draw.io Diagram Builder",
+  "version": "1.0.0",
+  "description": "Create professional Draw.io (diagrams.net) XML diagrams for architecture, network flows, and system designs",
+  "author": "alycd",
+  "license": "MIT",
+  "homepage": "https://github.com/alycd/agent-skills/tree/main/.claude/skills/draw-io",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/alycd/agent-skills.git",
+    "directory": ".claude/skills/draw-io"
+  },
+  "category": "visualization",
+  "tags": [
+    "diagrams",
+    "architecture",
+    "draw.io",
+    "flowcharts",
+    "visualization",
+    "aws",
+    "gcp",
+    "network-diagrams",
+    "system-design"
+  ],
+  "keywords": [
+    "draw.io",
+    "diagrams.net",
+    "architecture",
+    "flowchart",
+    "network diagram",
+    "system design",
+    "aws icons",
+    "gcp icons",
+    "xml"
+  ],
+  "triggers": [
+    "create a diagram",
+    "architecture diagram",
+    "flow chart",
+    "network diagram",
+    "system diagram",
+    "draw.io",
+    "diagrams.net"
+  ],
+  "requirements": {
+    "claude": ">=1.0.0",
+    "tools": ["Write", "Read"],
+    "external_dependencies": []
+  },
+  "files": {
+    "main": "SKILL.md",
+    "readme": "README.md",
+    "templates": [
+      "templates/example-diagram.drawio.xml"
+    ],
+    "references": [
+      "references/api-reference.md"
+    ]
+  },
+  "features": [
+    "AWS/GCP Icon Support with hex icons",
+    "Smart Grouping for related components",
+    "Professional Styling with consistent colors and shadows",
+    "Flexible Layouts (linear, branching, grouped)",
+    "Built-in XML Validation"
+  ],
+  "examples": [
+    {
+      "title": "Simple Linear Flow",
+      "command": "Create a diagram: API → Load Balancer → App Server → Database",
+      "output": "4 boxes horizontally aligned with blue arrows"
+    },
+    {
+      "title": "Grouped Components",
+      "command": "MTA → Gateway → [web1, web2, web3] → Database",
+      "output": "Group container with web servers and single arrow entry"
+    },
+    {
+      "title": "Branching Flow",
+      "command": "Input → Processor → [Storage, Analytics, Notifications]",
+      "output": "Processor with three arrows to separate endpoints"
+    }
+  ],
+  "changelog": [
+    {
+      "version": "1.0.0",
+      "date": "2026-02-12",
+      "changes": [
+        "Initial release",
+        "AWS/GCP icon support",
+        "Smart grouping functionality",
+        "Professional styling templates",
+        "Complete API reference documentation"
+      ]
+    }
+  ],
+  "install": {
+    "methods": [
+      {
+        "type": "git-clone",
+        "command": "git clone https://github.com/alycd/agent-skills.git ~/agent-skills && cp -r ~/agent-skills/.claude/skills/draw-io ~/.claude/skills/"
+      },
+      {
+        "type": "curl",
+        "command": "mkdir -p ~/.claude/skills/draw-io && curl -L https://github.com/alycd/agent-skills/archive/main.tar.gz | tar xz --strip=3 -C ~/.claude/skills/draw-io agent-skills-main/.claude/skills/draw-io"
+      }
+    ]
+  },
+  "metadata": {
+    "created": "2026-02-06",
+    "updated": "2026-02-12",
+    "downloads": 0,
+    "stars": 0
+  }
+}

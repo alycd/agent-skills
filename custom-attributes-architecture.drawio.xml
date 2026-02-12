@@ -1,0 +1,219 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="app.diagrams.net" agent="Claude Code" version="28.1.2">
+  <diagram id="custom-attributes-arch" name="Page-1">
+    <mxGraphModel dx="1554" dy="797" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1600" pageHeight="1000" background="#ffffff" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <!-- Title Bar -->
+        <mxCell id="title-bar" value="Custom Attributes System Architecture" style="strokeColor=none;fillColor=#4DA1F5;shadow=1;fontSize=16;fontStyle=1;align=left;spacingLeft=50;fontColor=#ffffff;rounded=1;" vertex="1" parent="1">
+          <mxGeometry x="100" y="60" width="1400" height="50" as="geometry" />
+        </mxCell>
+
+        <!-- Section: CSV Upload Flow -->
+        <mxCell id="section-upload-label" value="CSV Upload Flow" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=14;fontStyle=1;fontColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="120" y="140" width="200" height="30" as="geometry" />
+        </mxCell>
+
+        <!-- CSV Upload -->
+        <mxCell id="box-csv" value="" style="strokeColor=#dddddd;fillColor=#ffffff;shadow=1;strokeWidth=1;rounded=1;absoluteArcSize=1;arcSize=2;" vertex="1" parent="1">
+          <mxGeometry x="140" y="180" width="180" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="box-csv-label" value="&lt;font color=&quot;#000000&quot;&gt;Input&lt;/font&gt;&lt;br&gt;CSV Upload&lt;hr&gt;&lt;font style=&quot;font-size: 11px&quot;&gt;Standard + Custom columns&lt;/font&gt;" style="dashed=0;connectable=0;html=1;fillColor=#5184F3;strokeColor=none;shape=mxgraph.gcp2.hexIcon;prIcon=cloud_storage;part=1;labelPosition=right;verticalLabelPosition=middle;align=left;verticalAlign=top;spacingLeft=5;fontColor=#999999;fontSize=12;spacingTop=-8;" vertex="1" parent="box-csv">
+          <mxGeometry width="44" height="39" relative="1" as="geometry">
+            <mxPoint x="5" y="15" as="offset" />
+          </mxGeometry>
+        </mxCell>
+
+        <!-- Column Mapper -->
+        <mxCell id="box-mapper" value="" style="strokeColor=#dddddd;fillColor=#ffffff;shadow=1;strokeWidth=1;rounded=1;absoluteArcSize=1;arcSize=2;" vertex="1" parent="1">
+          <mxGeometry x="380" y="180" width="180" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="box-mapper-label" value="&lt;font color=&quot;#000000&quot;&gt;Processing&lt;/font&gt;&lt;br&gt;Column Mapper&lt;hr&gt;&lt;font style=&quot;font-size: 11px&quot;&gt;Standard vs Custom&lt;/font&gt;" style="dashed=0;connectable=0;html=1;fillColor=#FBBC04;strokeColor=none;shape=mxgraph.gcp2.hexIcon;prIcon=cloud_functions;part=1;labelPosition=right;verticalLabelPosition=middle;align=left;verticalAlign=top;spacingLeft=5;fontColor=#999999;fontSize=12;spacingTop=-8;" vertex="1" parent="box-mapper">
+          <mxGeometry width="44" height="39" relative="1" as="geometry">
+            <mxPoint x="5" y="15" as="offset" />
+          </mxGeometry>
+        </mxCell>
+
+        <!-- Row Parser -->
+        <mxCell id="box-parser" value="" style="strokeColor=#dddddd;fillColor=#ffffff;shadow=1;strokeWidth=1;rounded=1;absoluteArcSize=1;arcSize=2;" vertex="1" parent="1">
+          <mxGeometry x="620" y="180" width="180" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="box-parser-label" value="&lt;font color=&quot;#000000&quot;&gt;Processing&lt;/font&gt;&lt;br&gt;Row Parser&lt;hr&gt;&lt;font style=&quot;font-size: 11px&quot;&gt;Extract attributes&lt;/font&gt;" style="dashed=0;connectable=0;html=1;fillColor=#FBBC04;strokeColor=none;shape=mxgraph.gcp2.hexIcon;prIcon=cloud_dataflow;part=1;labelPosition=right;verticalLabelPosition=middle;align=left;verticalAlign=top;spacingLeft=5;fontColor=#999999;fontSize=12;spacingTop=-8;" vertex="1" parent="box-parser">
+          <mxGeometry width="44" height="39" relative="1" as="geometry">
+            <mxPoint x="5" y="15" as="offset" />
+          </mxGeometry>
+        </mxCell>
+
+        <!-- Database Group -->
+        <mxCell id="group-database" value="PostgreSQL Database" style="fillColor=#E3F2FD;strokeColor=#64B5F6;strokeWidth=2;rounded=1;arcSize=5;shadow=1;fontSize=13;fontStyle=1;align=left;spacingLeft=20;spacingTop=10;fontColor=#1976D2;" vertex="1" parent="1">
+          <mxGeometry x="860" y="140" width="620" height="280" as="geometry" />
+        </mxCell>
+
+        <!-- Customer Table -->
+        <mxCell id="box-customer-table" value="" style="strokeColor=#dddddd;fillColor=#ffffff;shadow=1;strokeWidth=1;rounded=1;absoluteArcSize=1;arcSize=2;" vertex="1" parent="1">
+          <mxGeometry x="900" y="200" width="240" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="box-customer-table-label" value="&lt;font color=&quot;#000000&quot;&gt;Storage&lt;/font&gt;&lt;br&gt;customer.customer&lt;hr&gt;&lt;font style=&quot;font-size: 11px&quot;&gt;Standard fields + custom_attributes JSONB&lt;/font&gt;" style="dashed=0;connectable=0;html=1;fillColor=#EA4335;strokeColor=none;shape=mxgraph.gcp2.hexIcon;prIcon=cloud_sql;part=1;labelPosition=right;verticalLabelPosition=middle;align=left;verticalAlign=top;spacingLeft=5;fontColor=#999999;fontSize=12;spacingTop=-8;" vertex="1" parent="box-customer-table">
+          <mxGeometry width="44" height="39" relative="1" as="geometry">
+            <mxPoint x="5" y="20" as="offset" />
+          </mxGeometry>
+        </mxCell>
+
+        <!-- Attribute Definitions Table -->
+        <mxCell id="box-definitions-table" value="" style="strokeColor=#dddddd;fillColor=#ffffff;shadow=1;strokeWidth=1;rounded=1;absoluteArcSize=1;arcSize=2;" vertex="1" parent="1">
+          <mxGeometry x="900" y="320" width="240" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="box-definitions-table-label" value="&lt;font color=&quot;#000000&quot;&gt;Metadata&lt;/font&gt;&lt;br&gt;attribute_definition&lt;hr&gt;&lt;font style=&quot;font-size: 11px&quot;&gt;Track available merge tags&lt;/font&gt;" style="dashed=0;connectable=0;html=1;fillColor=#5184F3;strokeColor=none;shape=mxgraph.gcp2.hexIcon;prIcon=bigquery;part=1;labelPosition=right;verticalLabelPosition=middle;align=left;verticalAlign=top;spacingLeft=5;fontColor=#999999;fontSize=12;spacingTop=-8;" vertex="1" parent="box-definitions-table">
+          <mxGeometry width="44" height="39" relative="1" as="geometry">
+            <mxPoint x="5" y="15" as="offset" />
+          </mxGeometry>
+        </mxCell>
+
+        <!-- Upsert Logic -->
+        <mxCell id="box-upsert" value="" style="strokeColor=#dddddd;fillColor=#ffffff;shadow=1;strokeWidth=1;rounded=1;absoluteArcSize=1;arcSize=2;" vertex="1" parent="1">
+          <mxGeometry x="1200" y="240" width="240" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="box-upsert-label" value="&lt;font color=&quot;#000000&quot;&gt;Logic&lt;/font&gt;&lt;br&gt;Upsert &amp; Merge&lt;hr&gt;&lt;font style=&quot;font-size: 11px&quot;&gt;Update customer + merge JSONB attributes&lt;/font&gt;" style="dashed=0;connectable=0;html=1;fillColor=#34A853;strokeColor=none;shape=mxgraph.gcp2.hexIcon;prIcon=compute_engine;part=1;labelPosition=right;verticalLabelPosition=middle;align=left;verticalAlign=top;spacingLeft=5;fontColor=#999999;fontSize=12;spacingTop=-8;" vertex="1" parent="box-upsert">
+          <mxGeometry width="44" height="39" relative="1" as="geometry">
+            <mxPoint x="5" y="20" as="offset" />
+          </mxGeometry>
+        </mxCell>
+
+        <!-- Section: Mail Merge Flow -->
+        <mxCell id="section-merge-label" value="Mail Merge Flow" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=14;fontStyle=1;fontColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="120" y="470" width="200" height="30" as="geometry" />
+        </mxCell>
+
+        <!-- Email Template -->
+        <mxCell id="box-template" value="" style="strokeColor=#dddddd;fillColor=#ffffff;shadow=1;strokeWidth=1;rounded=1;absoluteArcSize=1;arcSize=2;" vertex="1" parent="1">
+          <mxGeometry x="140" y="510" width="200" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="box-template-label" value="&lt;font color=&quot;#000000&quot;&gt;Input&lt;/font&gt;&lt;br&gt;Email Template&lt;hr&gt;&lt;font style=&quot;font-size: 11px&quot;&gt;Contains {{merge_tags}}&lt;/font&gt;" style="dashed=0;connectable=0;html=1;fillColor=#FF9900;strokeColor=none;shape=mxgraph.gcp2.hexIcon;prIcon=cloud_vpn;part=1;labelPosition=right;verticalLabelPosition=middle;align=left;verticalAlign=top;spacingLeft=5;fontColor=#999999;fontSize=12;spacingTop=-8;" vertex="1" parent="box-template">
+          <mxGeometry width="44" height="39" relative="1" as="geometry">
+            <mxPoint x="5" y="15" as="offset" />
+          </mxGeometry>
+        </mxCell>
+
+        <!-- Get Available Tags -->
+        <mxCell id="box-get-tags" value="" style="strokeColor=#dddddd;fillColor=#ffffff;shadow=1;strokeWidth=1;rounded=1;absoluteArcSize=1;arcSize=2;" vertex="1" parent="1">
+          <mxGeometry x="140" y="650" width="200" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="box-get-tags-label" value="&lt;font color=&quot;#000000&quot;&gt;API&lt;/font&gt;&lt;br&gt;Get Merge Tags&lt;hr&gt;&lt;font style=&quot;font-size: 11px&quot;&gt;Show available tags to user&lt;/font&gt;" style="dashed=0;connectable=0;html=1;fillColor=#5184F3;strokeColor=none;shape=mxgraph.gcp2.hexIcon;prIcon=cloud_functions;part=1;labelPosition=right;verticalLabelPosition=middle;align=left;verticalAlign=top;spacingLeft=5;fontColor=#999999;fontSize=12;spacingTop=-8;" vertex="1" parent="box-get-tags">
+          <mxGeometry width="44" height="39" relative="1" as="geometry">
+            <mxPoint x="5" y="15" as="offset" />
+          </mxGeometry>
+        </mxCell>
+
+        <!-- Fetch Customer -->
+        <mxCell id="box-fetch" value="" style="strokeColor=#dddddd;fillColor=#ffffff;shadow=1;strokeWidth=1;rounded=1;absoluteArcSize=1;arcSize=2;" vertex="1" parent="1">
+          <mxGeometry x="410" y="510" width="200" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="box-fetch-label" value="&lt;font color=&quot;#000000&quot;&gt;Query&lt;/font&gt;&lt;br&gt;Fetch Customer&lt;hr&gt;&lt;font style=&quot;font-size: 11px&quot;&gt;Get all data + custom_attributes&lt;/font&gt;" style="dashed=0;connectable=0;html=1;fillColor=#EA4335;strokeColor=none;shape=mxgraph.gcp2.hexIcon;prIcon=cloud_sql;part=1;labelPosition=right;verticalLabelPosition=middle;align=left;verticalAlign=top;spacingLeft=5;fontColor=#999999;fontSize=12;spacingTop=-8;" vertex="1" parent="box-fetch">
+          <mxGeometry width="44" height="39" relative="1" as="geometry">
+            <mxPoint x="5" y="15" as="offset" />
+          </mxGeometry>
+        </mxCell>
+
+        <!-- Mail Merge Service -->
+        <mxCell id="box-merge-service" value="" style="strokeColor=#dddddd;fillColor=#ffffff;shadow=1;strokeWidth=1;rounded=1;absoluteArcSize=1;arcSize=2;" vertex="1" parent="1">
+          <mxGeometry x="680" y="510" width="220" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="box-merge-service-label" value="&lt;font color=&quot;#000000&quot;&gt;Processing&lt;/font&gt;&lt;br&gt;Mail Merge Service&lt;hr&gt;&lt;font style=&quot;font-size: 11px&quot;&gt;Replace {{tags}} with values&lt;/font&gt;" style="dashed=0;connectable=0;html=1;fillColor=#34A853;strokeColor=none;shape=mxgraph.gcp2.hexIcon;prIcon=cloud_dataflow;part=1;labelPosition=right;verticalLabelPosition=middle;align=left;verticalAlign=top;spacingLeft=5;fontColor=#999999;fontSize=12;spacingTop=-8;" vertex="1" parent="box-merge-service">
+          <mxGeometry width="44" height="39" relative="1" as="geometry">
+            <mxPoint x="5" y="15" as="offset" />
+          </mxGeometry>
+        </mxCell>
+
+        <!-- Rendered Email -->
+        <mxCell id="box-rendered" value="" style="strokeColor=#dddddd;fillColor=#ffffff;shadow=1;strokeWidth=1;rounded=1;absoluteArcSize=1;arcSize=2;" vertex="1" parent="1">
+          <mxGeometry x="970" y="510" width="200" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="box-rendered-label" value="&lt;font color=&quot;#000000&quot;&gt;Output&lt;/font&gt;&lt;br&gt;Rendered Email&lt;hr&gt;&lt;font style=&quot;font-size: 11px&quot;&gt;Personalized content&lt;/font&gt;" style="dashed=0;connectable=0;html=1;fillColor=#4285F4;strokeColor=none;shape=mxgraph.gcp2.hexIcon;prIcon=cloud_pubsub;part=1;labelPosition=right;verticalLabelPosition=middle;align=left;verticalAlign=top;spacingLeft=5;fontColor=#999999;fontSize=12;spacingTop=-8;" vertex="1" parent="box-rendered">
+          <mxGeometry width="44" height="39" relative="1" as="geometry">
+            <mxPoint x="5" y="15" as="offset" />
+          </mxGeometry>
+        </mxCell>
+
+        <!-- Constraints Info Box -->
+        <mxCell id="box-constraints" value="&lt;b&gt;Constraints&lt;/b&gt;&lt;hr&gt;• Max 10 custom attributes per customer&lt;br&gt;• Types: text, numbers, dates&lt;br&gt;• Merge behavior: update, not replace&lt;br&gt;• Upsert by account_id + email" style="strokeColor=#FF9900;fillColor=#FFF3E0;shadow=1;strokeWidth=2;rounded=1;arcSize=5;fontSize=11;align=left;spacingLeft=10;spacingTop=10;fontColor=#333333;" vertex="1" parent="1">
+          <mxGeometry x="1230" y="510" width="250" height="120" as="geometry" />
+        </mxCell>
+
+        <!-- Key Features Box -->
+        <mxCell id="box-features" value="&lt;b&gt;Key Features&lt;/b&gt;&lt;hr&gt;• JSONB for flexible storage&lt;br&gt;• Metadata table for fast tag lookup&lt;br&gt;• Case-insensitive column mapping&lt;br&gt;• Read-optimized for mail merge" style="strokeColor=#34A853;fillColor=#E8F5E9;shadow=1;strokeWidth=2;rounded=1;arcSize=5;fontSize=11;align=left;spacingLeft=10;spacingTop=10;fontColor=#333333;" vertex="1" parent="1">
+          <mxGeometry x="1230" y="660" width="250" height="120" as="geometry" />
+        </mxCell>
+
+        <!-- Arrows: Upload Flow -->
+        <mxCell id="edge-csv-mapper" style="edgeStyle=orthogonalEdgeStyle;rounded=0;strokeColor=#4284F3;strokeWidth=2;startFill=1;endArrow=blockThin;endFill=1;" edge="1" parent="1" source="box-csv" target="box-mapper">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="edge-mapper-parser" style="edgeStyle=orthogonalEdgeStyle;rounded=0;strokeColor=#4284F3;strokeWidth=2;startFill=1;endArrow=blockThin;endFill=1;" edge="1" parent="1" source="box-mapper" target="box-parser">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="edge-parser-db" style="edgeStyle=orthogonalEdgeStyle;rounded=0;strokeColor=#4284F3;strokeWidth=2;startFill=1;endArrow=blockThin;endFill=1;" edge="1" parent="1" source="box-parser" target="group-database">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="820" y="225" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="edge-customer-upsert" style="edgeStyle=orthogonalEdgeStyle;rounded=0;strokeColor=#4284F3;strokeWidth=2;startFill=1;endArrow=blockThin;endFill=1;" edge="1" parent="1" source="box-customer-table" target="box-upsert">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="edge-definitions-upsert" style="edgeStyle=orthogonalEdgeStyle;rounded=0;strokeColor=#4284F3;strokeWidth=2;startFill=1;endArrow=blockThin;endFill=1;" edge="1" parent="1" source="box-definitions-table" target="box-upsert">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1170" y="360" />
+              <mxPoint x="1170" y="290" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- Arrows: Mail Merge Flow -->
+        <mxCell id="edge-template-fetch" style="edgeStyle=orthogonalEdgeStyle;rounded=0;strokeColor=#4284F3;strokeWidth=2;startFill=1;endArrow=blockThin;endFill=1;" edge="1" parent="1" source="box-template" target="box-fetch">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="edge-fetch-merge" style="edgeStyle=orthogonalEdgeStyle;rounded=0;strokeColor=#4284F3;strokeWidth=2;startFill=1;endArrow=blockThin;endFill=1;" edge="1" parent="1" source="box-fetch" target="box-merge-service">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="edge-merge-rendered" style="edgeStyle=orthogonalEdgeStyle;rounded=0;strokeColor=#4284F3;strokeWidth=2;startFill=1;endArrow=blockThin;endFill=1;" edge="1" parent="1" source="box-merge-service" target="box-rendered">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="edge-tags-definitions" style="edgeStyle=orthogonalEdgeStyle;rounded=0;strokeColor=#4284F3;strokeWidth=2;startFill=1;endArrow=blockThin;endFill=1;dashed=1;" edge="1" parent="1" source="box-get-tags" target="box-definitions-table">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="240" y="790" />
+              <mxPoint x="1020" y="790" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- Arrow Labels -->
+        <mxCell id="label-parse" value="Standard + Custom" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=10;fontColor=#666666;fontStyle=2;" vertex="1" parent="1">
+          <mxGeometry x="610" y="200" width="120" height="20" as="geometry" />
+        </mxCell>
+
+        <mxCell id="label-upsert" value="Merge JSONB" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=10;fontColor=#666666;fontStyle=2;" vertex="1" parent="1">
+          <mxGeometry x="1150" y="260" width="100" height="20" as="geometry" />
+        </mxCell>
+
+        <mxCell id="label-fetch" value="Query" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=10;fontColor=#666666;fontStyle=2;" vertex="1" parent="1">
+          <mxGeometry x="620" y="530" width="60" height="20" as="geometry" />
+        </mxCell>
+
+        <mxCell id="label-available" value="Available tags" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=10;fontColor=#666666;fontStyle=2;" vertex="1" parent="1">
+          <mxGeometry x="520" y="770" width="100" height="20" as="geometry" />
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

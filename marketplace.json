@@ -1,0 +1,71 @@
+{
+  "name": "Agent Skills Marketplace",
+  "version": "1.0.0",
+  "description": "Community marketplace for Claude Code agent skills",
+  "repository": "https://github.com/alycd/agent-skills",
+  "author": "alycd",
+  "license": "MIT",
+  "skills": [
+    {
+      "id": "draw-io",
+      "name": "Draw.io Diagram Builder",
+      "version": "1.0.0",
+      "description": "Create professional Draw.io (diagrams.net) XML diagrams for architecture, network flows, and system designs. Use when the user asks to create diagrams, architecture diagrams, flow charts, network diagrams, system diagrams, or mentions Draw.io/diagrams.net. Supports AWS/GCP icons, grouping, and custom styling.",
+      "category": "visualization",
+      "tags": ["diagrams", "architecture", "draw.io", "flowcharts", "visualization", "aws", "gcp"],
+      "author": "alycd",
+      "path": ".claude/skills/draw-io",
+      "install_url": "https://github.com/alycd/agent-skills/tree/main/.claude/skills/draw-io",
+      "dependencies": [],
+      "requirements": {
+        "tools": ["Write", "Read"],
+        "external": []
+      },
+      "features": [
+        "AWS/GCP Icon Support",
+        "Smart Grouping",
+        "Professional Styling",
+        "Flexible Layouts",
+        "Validation Built-in"
+      ]
+    },
+    {
+      "id": "skill-writer",
+      "name": "Skill Writer",
+      "version": "1.0.0",
+      "description": "Guide users through creating Agent Skills for Claude Code. Use when the user wants to create, write, author, or design a new Skill, or needs help with SKILL.md files, frontmatter, or skill structure.",
+      "category": "development",
+      "tags": ["skill-development", "authoring", "documentation", "meta"],
+      "author": "alycd",
+      "path": ".claude/skills/skill-writer",
+      "install_url": "https://github.com/alycd/agent-skills/tree/main/.claude/skills/skill-writer",
+      "dependencies": [],
+      "requirements": {
+        "tools": ["Write", "Read", "Edit"],
+        "external": []
+      },
+      "features": [
+        "Guided skill creation",
+        "YAML frontmatter validation",
+        "Best practices enforcement",
+        "Directory structure setup",
+        "Testing guidance"
+      ]
+    }
+  ],
+  "categories": {
+    "visualization": {
+      "name": "Visualization",
+      "description": "Skills for creating diagrams, charts, and visual representations"
+    },
+    "development": {
+      "name": "Development",
+      "description": "Skills for software development workflows and tooling"
+    }
+  },
+  "metadata": {
+    "last_updated": "2026-02-12",
+    "skill_count": 2,
+    "total_downloads": 0
+  }
+}

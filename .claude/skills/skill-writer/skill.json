@@ -1,0 +1,101 @@
+{
+  "id": "skill-writer",
+  "name": "Skill Writer",
+  "version": "1.0.0",
+  "description": "Guide users through creating Agent Skills for Claude Code with validation and best practices",
+  "author": "alycd",
+  "license": "MIT",
+  "homepage": "https://github.com/alycd/agent-skills/tree/main/.claude/skills/skill-writer",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/alycd/agent-skills.git",
+    "directory": ".claude/skills/skill-writer"
+  },
+  "category": "development",
+  "tags": [
+    "skill-development",
+    "authoring",
+    "documentation",
+    "meta",
+    "tooling",
+    "workflow"
+  ],
+  "keywords": [
+    "skill creation",
+    "SKILL.md",
+    "frontmatter",
+    "yaml",
+    "skill structure",
+    "skill authoring",
+    "documentation"
+  ],
+  "triggers": [
+    "create a skill",
+    "write a skill",
+    "author a skill",
+    "design a skill",
+    "SKILL.md",
+    "skill frontmatter",
+    "skill structure"
+  ],
+  "requirements": {
+    "claude": ">=1.0.0",
+    "tools": ["Write", "Read", "Edit", "Bash"],
+    "external_dependencies": []
+  },
+  "files": {
+    "main": "SKILL.md",
+    "readme": "README.md"
+  },
+  "features": [
+    "Guided skill creation workflow",
+    "YAML frontmatter validation",
+    "Best practices enforcement",
+    "Automatic directory structure setup",
+    "Testing and debugging guidance",
+    "Description optimization tips"
+  ],
+  "examples": [
+    {
+      "title": "Create a new skill",
+      "command": "Help me create a skill for PDF processing",
+      "output": "Interactive workflow with questions and file generation"
+    },
+    {
+      "title": "Validate existing skill",
+      "command": "Check if my skill frontmatter is correct",
+      "output": "Validation checklist with specific fixes"
+    }
+  ],
+  "changelog": [
+    {
+      "version": "1.0.0",
+      "date": "2026-02-12",
+      "changes": [
+        "Initial release",
+        "Guided skill creation workflow",
+        "Frontmatter validation",
+        "Best practices checklist",
+        "Testing instructions"
+      ]
+    }
+  ],
+  "install": {
+    "methods": [
+      {
+        "type": "git-clone",
+        "command": "git clone https://github.com/alycd/agent-skills.git ~/agent-skills && cp -r ~/agent-skills/.claude/skills/skill-writer ~/.claude/skills/"
+      },
+      {
+        "type": "curl",
+        "command": "mkdir -p ~/.claude/skills/skill-writer && curl -L https://github.com/alycd/agent-skills/archive/main.tar.gz | tar xz --strip=3 -C ~/.claude/skills/skill-writer agent-skills-main/.claude/skills/skill-writer"
+      }
+    ]
+  },
+  "metadata": {
+    "created": "2026-02-11",
+    "updated": "2026-02-12",
+    "downloads": 0,
+    "stars": 0
+  }
+}
