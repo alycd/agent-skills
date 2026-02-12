@@ -1,0 +1,23 @@
+{
+  "name": "alycd-agent-skills",
+  "owner": {
+    "name": "alycd",
+    "email": "your-email@example.com"
+  },
+  "metadata": {
+    "description": "Community marketplace for Claude Code agent skills - professional diagrams, skill authoring, and more",
+    "version": "1.0.0"
+  },
+  "plugins": [
+    {
+      "name": "agent-skills",
+      "source": {
+        "source": "url",
+        "url": "https://github.com/alycd/agent-skills.git"
+      },
+      "description": "Agent Skills bundle: Draw.io diagram builder + Skill Writer for Claude Code. Create professional architecture diagrams and author custom skills.",
+      "version": "1.0.0",
+      "strict": true
+    }
+  ]
+}

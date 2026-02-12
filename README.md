@@ -38,14 +38,23 @@ Guide for creating high-quality Agent Skills with validation, best practices, an
 
 Choose your preferred installation method:
 
-### Method 1: Git Clone (Recommended)
+### Method 1: Plugin Marketplace (Easiest)
+```bash
+# Add this marketplace to Claude Code
+ln -s ~/agent-skills ~/.claude/plugins/marketplaces/alycd-agent-skills
+
+# Then install plugins via Claude Code's plugin system
+# (Check Claude Code documentation for plugin installation commands)
+```
+
+### Method 2: Git Clone (Recommended)
 ```bash
 # Install all skills
 git clone https://github.com/alycd/agent-skills.git ~/agent-skills
 cp -r ~/agent-skills/.claude/skills/* ~/.claude/skills/
 ```
 
-### Method 2: Single Skill
+### Method 3: Single Skill
 ```bash
 # Install just one skill (e.g., draw-io)
 mkdir -p ~/.claude/skills/draw-io
@@ -79,7 +88,10 @@ agent-skills/
 │           ├── SKILL.md
 │           ├── skill.json
 │           └── README.md
-├── marketplace.json         # Marketplace catalog
+├── .claude-plugin/          # Plugin marketplace config
+│   ├── marketplace.json     # Marketplace definition (read by Claude Code)
+│   └── README.md            # Marketplace documentation
+├── marketplace.json         # Marketplace catalog (for browsing)
 ├── CATALOG.md              # Browse all skills
 ├── INSTALL.md              # Installation guide
 └── README.md               # This file
