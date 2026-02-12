@@ -5,21 +5,6 @@
 
 A curated marketplace of professional Agent Skills for Claude Code. Install skills to enhance Claude's capabilities with specialized knowledge, workflows, and tools.
 
-## 🚀 Quick Start
-
-Install your first skill in under 1 minute:
-
-```bash
-# Clone the marketplace
-git clone https://github.com/alycd/agent-skills.git ~/agent-skills
-
-# Install the Draw.io skill
-cp -r ~/agent-skills/.claude/skills/draw-io ~/.claude/skills/
-
-# Start using it!
-# Just ask Claude: "Create a diagram showing API → Database"
-```
-
 ## 📚 Available Skills
 
 ### 🎨 [Draw.io Diagram Builder](./.claude/skills/draw-io)
