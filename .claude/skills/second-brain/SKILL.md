@@ -130,6 +130,35 @@ When the user says "show all open follow-ups", "who do I need to follow up with"
 
 ---
 
+### Action: Consensus synthesis across people
+
+When the user asks "what do people agree on", "find consensus", "where do they align", "what's the common thread", or "scan everyone on [topic]":
+
+1. Glob all files in `~/.claude/second-brain/*.md` and read each one fully.
+2. Extract Motivation, Key Facts, and any relevant notes per person.
+3. Identify:
+   - **Points of agreement** — shared themes, overlapping goals, similar product/strategy opinions
+   - **Points of divergence** — where motivations or opinions differ
+   - **Alignment opportunities** — what framing could bring divergent people into agreement
+4. Output a consensus report:
+
+```
+## Consensus Report — [Topic or "All People"]
+
+**Where they agree:**
+- Shared theme or belief (held by Person A, Person B)
+
+**Where they diverge:**
+- Point of difference: Person A thinks X, Person B thinks Y
+
+**How to build alignment:**
+- Frame the discussion around [shared value] to bring both sides together
+```
+
+5. If a specific topic was given (e.g., "consensus on the product roadmap"), filter synthesis to facts and motivations relevant to that topic.
+
+---
+
 ### Action: Understand someone's motivation
 
 When the user asks "how should I approach X", "how do I persuade X", "what does X care about", "how should I frame this to X":
@@ -164,3 +193,6 @@ When the user asks "how should I approach X", "how do I persuade X", "what does 
 | "Import this file about Sarah" | Parse + merge into profile |
 | "Who do I need to follow up with?" | Dashboard synthesis |
 | "What's pending with everyone?" | Dashboard synthesis |
+| "Find consensus on X" | Consensus synthesis |
+| "Where do people agree?" | Consensus synthesis |
+| "Scan everyone on [topic]" | Consensus synthesis |
