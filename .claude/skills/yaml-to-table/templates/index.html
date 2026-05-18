@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>YAML to Table</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: system-ui, -apple-system, sans-serif; background: #f3f4f6; min-height: 100vh; }
+    .controls {
+      background: white;
+      border-bottom: 1px solid #e5e7eb;
+      padding: 16px 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      box-shadow: 0 1px 3px rgba(0,0,0,.08);
+    }
+    .input-row { display: flex; gap: 8px; align-items: center; }
+    #url-input {
+      flex: 1;
+      padding: 8px 12px;
+      border: 1.5px solid #d1d5db;
+      border-radius: 6px;
+      font-size: 0.875rem;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+    #url-input:focus { border-color: #3498db; }
+    .or-divider {
+      font-size: 0.75rem;
+      color: #9ca3af;
+      cursor: pointer;
+      user-select: none;
+      padding: 2px 0;
+    }
+    .or-divider:hover { color: #6b7280; }
+    #yaml-textarea {
+      width: 100%;
+      padding: 8px 12px;
+      border: 1.5px solid #d1d5db;
+      border-radius: 6px;
+      font-size: 0.875rem;
+      font-family: monospace;
+      resize: vertical;
+      outline: none;
+      transition: border-color 0.15s;
+      min-height: 80px;
+      display: none;
+    }
+    #yaml-textarea:focus { border-color: #3498db; }
+    #yaml-textarea.visible { display: block; }
+    .render-btn {
+      padding: 8px 18px;
+      background: #2980b9;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 0.875rem;
+      font-weight: 500;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background 0.15s;
+    }
+    .render-btn:hover { background: #2471a3; }
+    .render-btn:disabled { background: #93c5fd; cursor: default; }
+    .palette-row {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      flex-wrap: wrap;
+    }
+    .palette-label { font-size: 0.75rem; color: #6b7280; margin-right: 2px; }
+    .swatch {
+      width: 18px; height: 18px;
+      border-radius: 50%;
+      cursor: pointer;
+      border: 2px solid transparent;
+      transition: transform 0.1s, border-color 0.1s;
+      flex-shrink: 0;
+    }
+    .swatch:hover { transform: scale(1.25); }
+    .swatch.selected { border-color: #111827; transform: scale(1.15); }
+    .swatch-none {
+      width: 18px; height: 18px;
+      border-radius: 50%;
+      cursor: pointer;
+      border: 2px solid #d1d5db;
+      background: white;
+      position: relative;
+      flex-shrink: 0;
+      transition: transform 0.1s;
+    }
+    .swatch-none::after {
+      content: "×";
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 11px;
+      color: #9ca3af;
+      line-height: 1;
+    }
+    .swatch-none:hover { transform: scale(1.25); }
+    .swatch-none.selected { border-color: #111827; }
+    .output { padding: 24px; }
+    .error-msg {
+      background: #fee2e2;
+      color: #b91c1c;
+      padding: 12px 16px;
+      border-radius: 6px;
+      font-size: 0.875rem;
+      border: 1px solid #fca5a5;
+    }
+    .table-wrap {
+      background: white;
+      border-radius: 8px;
+      padding: 24px;
+      box-shadow: 0 1px 3px rgba(0,0,0,.12);
+      overflow-x: auto;
+    }
+  </style>
+</head>
+<body>
+  <div class="controls">
+    <div class="input-row">
+      <input id="url-input" type="url" placeholder="Paste a YAML URL…" autocomplete="off" spellcheck="false">
+      <button class="render-btn" id="render-btn">Render</button>
+    </div>
+    <div class="or-divider" id="or-divider">── or paste YAML below ──</div>
+    <textarea id="yaml-textarea" placeholder="Paste YAML here…"></textarea>
+    <div class="palette-row" id="palette-row">
+      <span class="palette-label">Color:</span>
+      <div class="swatch-none selected" data-color="" title="No color"></div>
+    </div>
+  </div>
+  <div class="output" id="output"></div>
+
+  <script>
+    const PALETTE = [
+      {name: "Turquoise",     hex: "#1abc9c"},
+      {name: "Emerald",       hex: "#2ecc71"},
+      {name: "Peter River",   hex: "#3498db"},
+      {name: "Amethyst",      hex: "#9b59b6"},
+      {name: "Wet Asphalt",   hex: "#34495e"},
+      {name: "Green Sea",     hex: "#16a085"},
+      {name: "Nephritis",     hex: "#27ae60"},
+      {name: "Belize Hole",   hex: "#2980b9"},
+      {name: "Wisteria",      hex: "#8e44ad"},
+      {name: "Midnight Blue", hex: "#2c3e50"},
+      {name: "Sunflower",     hex: "#f1c40f"},
+      {name: "Carrot",        hex: "#e67e22"},
+      {name: "Alizarin",      hex: "#e74c3c"},
+      {name: "Clouds",        hex: "#ecf0f1"},
+      {name: "Concrete",      hex: "#95a5a6"},
+      {name: "Orange",        hex: "#f39c12"},
+      {name: "Pumpkin",       hex: "#d35400"},
+      {name: "Pomegranate",   hex: "#c0392b"},
+      {name: "Silver",        hex: "#bdc3c7"},
+      {name: "Asbestos",      hex: "#7f8c8d"},
+    ];
+
+    const urlInput   = document.getElementById("url-input");
+    const yamlArea   = document.getElementById("yaml-textarea");
+    const orDivider  = document.getElementById("or-divider");
+    const renderBtn  = document.getElementById("render-btn");
+    const output     = document.getElementById("output");
+    const paletteRow = document.getElementById("palette-row");
+
+    let selectedColor = "";
+    let activeMode    = "url";
+
+    // Build palette swatches
+    PALETTE.forEach(({name, hex}) => {
+      const s = document.createElement("div");
+      s.className = "swatch";
+      s.style.background = hex;
+      s.title = `${name} (${hex})`;
+      s.dataset.color = hex;
+      paletteRow.appendChild(s);
+    });
+
+    // Color swatch click
+    paletteRow.addEventListener("click", e => {
+      const target = e.target.closest("[data-color]");
+      if (!target) return;
+      selectedColor = target.dataset.color;
+      paletteRow.querySelectorAll("[data-color]").forEach(s => s.classList.remove("selected"));
+      target.classList.add("selected");
+    });
+
+    // Toggle URL / textarea mode
+    orDivider.addEventListener("click", () => {
+      activeMode === "url" ? showTextMode() : showUrlMode();
+    });
+    yamlArea.addEventListener("focus", () => { activeMode = "text"; });
+    urlInput.addEventListener("focus", () => {
+      activeMode = "url";
+      yamlArea.classList.remove("visible");
+    });
+
+    function showUrlMode()  { activeMode = "url";  yamlArea.classList.remove("visible"); urlInput.focus(); }
+    function showTextMode() { activeMode = "text"; yamlArea.classList.add("visible");    yamlArea.focus(); }
+
+    async function render() {
+      const url      = urlInput.value.trim();
+      const yamlText = yamlArea.value.trim();
+      const body     = {};
+
+      if (activeMode === "url" && url) {
+        body.url = url;
+      } else if (yamlText) {
+        body.yaml_text = yamlText;
+      } else {
+        showError("Enter a URL or paste YAML text.");
+        return;
+      }
+      if (selectedColor) body.color = selectedColor;
+
+      renderBtn.textContent = "Loading…";
+      renderBtn.disabled = true;
+
+      try {
+        const resp = await fetch("/api/render", {
+          method: "POST",
+          headers: {"Content-Type": "application/json"},
+          body: JSON.stringify(body),
+        });
+        const data = await resp.json();
+        if (data.error) {
+          showError(data.error);
+        } else {
+          showResult(data.html);
+          pushParams(url, selectedColor);
+        }
+      } catch (err) {
+        showError("Network error: " + err.message);
+      } finally {
+        renderBtn.textContent = "Render";
+        renderBtn.disabled = false;
+      }
+    }
+
+    function showError(msg) {
+      output.innerHTML = `<div class="error-msg">${escHtml(msg)}</div>`;
+    }
+    function showResult(html) {
+      output.innerHTML = `<div class="table-wrap">${html}</div>`;
+    }
+    function escHtml(s) {
+      return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    }
+    function pushParams(url, color) {
+      const p = new URLSearchParams();
+      if (url)   p.set("url",   url);
+      if (color) p.set("color", color);
+      const qs = p.toString();
+      history.pushState({}, "", qs ? `?${qs}` : location.pathname);
+    }
+
+    urlInput.addEventListener("keydown", e => { if (e.key === "Enter") render(); });
+    renderBtn.addEventListener("click", render);
+
+    // On page load: read ?url= and ?color= from address bar
+    (function init() {
+      const p     = new URLSearchParams(location.search);
+      const url   = p.get("url")   || "";
+      const color = p.get("color") || "";
+
+      if (color) {
+        selectedColor = color;
+        const match = paletteRow.querySelector(`[data-color="${CSS.escape(color)}"]`);
+        if (match) {
+          paletteRow.querySelectorAll("[data-color]").forEach(s => s.classList.remove("selected"));
+          match.classList.add("selected");
+        }
+      }
+      if (url) {
+        urlInput.value = url;
+        render();
+      } else {
+        urlInput.focus();
+      }
+    })();
+  </script>
+</body>
+</html>

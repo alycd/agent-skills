@@ -1,0 +1,45 @@
+entity:
+  id: lemons
+  name: lemons
+  product:
+    name: lemons
+    price: "$1.00"
+    description: lemons from china
+  mail:
+    approval:
+      thread_id: f8933910-702d-499d-8a0e-4c2167b81b71
+      message_id: <0100019e05ce4248-c5737040-1da6-4b18-898f-ea9d62fea27f-000000@email.amazonses.com>
+    final:
+      thread_id: 9702d28f-5823-4b67-9a4c-0e4a5e795545
+      message_id: <0100019e05d62210-bea5c992-7ffd-4a05-bd3a-f432497cb1b6-000000@email.amazonses.com>
+
+steps:
+  create_product:
+    status: done
+    completed_at: 2026-05-08T04:17:27Z
+    completed_by: human
+    notes: "Captured product price and description from user."
+  send_approval_email:
+    status: done
+    completed_at: 2026-05-08T04:17:43Z
+    completed_by: auto
+    notes: "Sent approval request."
+  monitor_approval_response:
+    status: done
+    completed_at: 2026-05-08T04:24:33Z
+    completed_by: auto
+    notes: "Polling result: approved."
+    retry_count: 0
+    retry_at: ~
+  send_links_email:
+    status: done
+    completed_at: 2026-05-08T04:26:19Z
+    completed_by: auto
+    notes: "Sent product links email."
+  monitor_final_response:
+    status: in_progress
+    completed_at: ~
+    completed_by: ~
+    notes: "Polling activated via cron job."
+    retry_count: 0
+    retry_at: ~
