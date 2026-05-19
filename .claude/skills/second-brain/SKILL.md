@@ -1,15 +1,15 @@
 ---
 name: second-brain
-description: Relationship intelligence and conversation tracking system. Keeps per-person profiles with motivations, follow-ups, talking points, and key facts. Use when the user mentions a specific person's name and wants to update notes, see follow-ups, understand someone's motivations, check what to follow up on, mark something as done, or synthesize across all contacts. Triggers on phrases like "update my notes on X", "what should I follow up with X", "add to X's profile", "what do I know about X", "mark X as done", "show all open follow-ups", "import notes from this file", or any request about a named individual in a relationship/professional context.
+description: Relationship intelligence and conversation tracking system. Keeps per-person profiles with motivations, follow-ups, talking points, and key facts. Use when the user mentions a specific person's name and wants to update notes, see follow-ups, understand someone's motivations, check what to follow up on, mark something as done, or synthesize across all contacts. Also use for daily prioritization: triggers on "daily summary", "what should I work on today", "morning briefing", "prioritize my day", "what's outstanding". Triggers on phrases like "update my notes on X", "what should I follow up with X", "add to X's profile", "what do I know about X", "mark X as done", "show all open follow-ups", "import notes from this file", or any request about a named individual in a relationship/professional context.
 ---
 
 # Second Brain — Relationship Intelligence
 
-Tracks conversations, motivations, follow-ups, and persuasion context per person. Data lives in `~/.claude/second-brain/`.
+Tracks conversations, motivations, follow-ups, and persuasion context per person. Data lives in `/Users/alysidi/git/naqi/vault/Naqi/second_brain`.
 
 ## File format
 
-Each person has a file at `~/.claude/second-brain/{first-last}.md` (lowercase, hyphenated). Example: `john-smith.md`.
+Each person has a file at `/Users/alysidi/git/naqi/vault/Naqi/second_brain/{first-last}.md` (lowercase, hyphenated). Example: `john-smith.md`.
 
 ```markdown
 ---
@@ -43,7 +43,7 @@ Notes from a specific conversation or meeting.
 ### On any person-related request
 
 1. **Identify the person** from the user's message (name, nickname, or "him/her" if clear from context).
-2. **Find their file**: `~/.claude/second-brain/{name}.md`. Use Glob to list all files if unsure of exact filename.
+2. **Find their file**: `/Users/alysidi/git/naqi/vault/Naqi/second_brain/{name}.md`. Use Glob to list all files if unsure of exact filename.
 3. **If file doesn't exist**, create it with the template above before proceeding.
 4. **Perform the requested action** from the list below.
 5. **Always show the updated "Open Follow-ups + Motivation" view** after any write operation.
@@ -97,6 +97,32 @@ When the user says "mark X as done", "checked off X", "completed X", "X is done"
 
 ---
 
+
+### Action: Lint follow-ups
+
+When the user says "lint followups", "complete followups", "sync followups", or "clean up followups":
+
+1. Glob all files in `/Users/alysidi/git/naqi/vault/Naqi/second_brain/*.md`.
+2. For each file, read the **Open Follow-ups** and **Completed** sections.
+3. Fix mismatches:
+   - `[x]` item found in **Open Follow-ups** → remove from Open Follow-ups, append to **Completed** preserving the text (replace `added DATE` with `completed DATE` or keep the existing ✅ date if present)
+   - `[ ]` item found in **Completed** → remove from Completed, append to **Open Follow-ups** (keep original text, restore `added` date if visible, or use today's date)
+4. Update `last-updated` frontmatter for any file that changed.
+5. Report a summary of every move made:
+
+```
+## Lint Results
+
+| Person | Item | Action |
+|--------|------|--------|
+| Rodney | Review AI roadmap | Open Follow-ups → Completed |
+| John   | Send proposal     | Completed → Open Follow-ups |
+```
+
+If nothing needed moving, report "All follow-ups are consistent — nothing to move."
+
+---
+
 ### Action: Import from a markdown file
 
 When the user provides a file path or pastes content from an existing notes file:
@@ -113,7 +139,7 @@ When the user provides a file path or pastes content from an existing notes file
 
 When the user says "show all open follow-ups", "who do I need to follow up with", "give me a dashboard", or "what's pending":
 
-1. Glob all files in `~/.claude/second-brain/*.md`.
+1. Glob all files in `/Users/alysidi/git/naqi/vault/Naqi/second_brain/*.md`.
 2. For each file, extract the **Open Follow-ups** section.
 3. Output a consolidated table:
 
@@ -134,7 +160,7 @@ When the user says "show all open follow-ups", "who do I need to follow up with"
 
 When the user asks "what do people agree on", "find consensus", "where do they align", "what's the common thread", or "scan everyone on [topic]":
 
-1. Glob all files in `~/.claude/second-brain/*.md` and read each one fully.
+1. Glob all files in `/Users/alysidi/git/naqi/vault/Naqi/second_brain/*.md` and read each one fully.
 2. Extract Motivation, Key Facts, and any relevant notes per person.
 3. Identify:
    - **Points of agreement** — shared themes, overlapping goals, similar product/strategy opinions
@@ -172,6 +198,58 @@ When the user asks "how should I approach X", "how do I persuade X", "what does 
 
 ---
 
+### Action: Daily Summary
+
+When the user says "daily summary", "what should I work on today", "morning briefing", "what's outstanding", "prioritize my day", "daily brief", or "what's my focus today":
+
+1. Glob all files in `/Users/alysidi/git/naqi/vault/Naqi/second_brain/*.md` and read each one fully.
+2. Collect every open `- [ ]` item across all files, noting the person's name and the `added YYYY-MM-DD` date.
+3. Calculate the **age** of each item in days from today's date.
+4. Classify each item into a priority tier:
+
+   | Tier | Label | Criteria |
+   |------|-------|----------|
+   | 🔴 | **Critical** | Age ≥ 7 days (stale/overdue) OR contains time-pressure keywords: "today", "tomorrow", "this week", "before [date]", "by [date]", "urgent", "asap", or a named upcoming event (e.g. "Viva Tech", "CES", "Beyond Expo", "launch") |
+   | 🟠 | **High** | Age 3–6 days OR references a near-term deliverable, meeting, or person dependency that blocks other work |
+   | 🟡 | **Normal** | Age 1–2 days — active but not yet pressured |
+   | 🟢 | **New** | Age 0 days — added today |
+
+5. Within each tier, sort items oldest-first (highest age first).
+6. Output the daily brief in this format:
+
+```
+## Daily Brief — YYYY-MM-DD
+
+### 🔴 Critical
+| Person | Follow-up | Added | Age |
+|--------|-----------|-------|-----|
+| Dave | Schedule 1.5hr session Thu/Fri | 2026-05-11 | 8d |
+
+### 🟠 High
+| Person | Follow-up | Added | Age |
+|--------|-----------|-------|-----|
+| Rodney | Create Git account for Rodney | 2026-05-15 | 4d |
+
+### 🟡 Normal
+| Person | Follow-up | Added | Age |
+|--------|-----------|-------|-----|
+| Dave | Review D59 documents | 2026-05-17 | 2d |
+
+### 🟢 New (added today)
+| Person | Follow-up | Added | Age |
+|--------|-----------|-------|-----|
+| Zavier | Write skateboard vs. ferrari doc | 2026-05-19 | 0d |
+
+---
+**Total open:** X items across Y people
+**Suggested focus:** [1–2 sentence recommendation on where to spend energy today, based on Critical + High items and any visible dependencies or upcoming events]
+```
+
+7. If all items fall in Normal or New, note that there are no overdue items and suggest tackling the oldest Normal items first.
+8. The **Suggested focus** line should synthesize context from Key Facts and Motivation sections — not just restate the list. For example: "Dave is expecting a session this week and has a Viva Tech deadline coming up — prioritize the scheduling item and D59 review."
+
+---
+
 ## Key behaviors
 
 - **Never overwrite** existing content — always append or merge.
@@ -196,3 +274,5 @@ When the user asks "how should I approach X", "how do I persuade X", "what does 
 | "Find consensus on X" | Consensus synthesis |
 | "Where do people agree?" | Consensus synthesis |
 | "Scan everyone on [topic]" | Consensus synthesis |
+| "Lint followups" / "complete followups" | Move mismatched checkboxes between Open Follow-ups and Completed |
+| "Daily summary" / "What should I work on?" / "Morning briefing" | Priority-classified daily brief across all people |
