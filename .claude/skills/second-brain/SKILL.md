@@ -131,6 +131,39 @@ Sort oldest-first within each tier. Skip empty tiers. Output each tier as `| Per
 
 ---
 
+### Craft message
+Triggers: `craft` keyword in args, e.g. `dave craft item 1`, `dave craft status update`, `dave craft item 2 context`
+
+**Purpose:** Generate a ready-to-send 1–2 line Slack/message for a specific follow-up item.
+
+**Parse:**
+- Person name → load their profile
+- Item selector: `item N` → pick the Nth open follow-up (1-indexed); or keyword match against follow-up text
+- Mode (optional, default = status):
+  - `status` / `status update` → ask where things stand
+  - `context` → share a relevant update or piece of info related to the item
+  - If no mode given, infer from the follow-up text: action items ("get intro", "send X", "set up") → context mode; waiting items ("waiting on", "check if", "confirm") → status mode
+
+**Generate message:**
+- Tone: direct, warm, no filler — matches the person's communication style from How to Frame Conversations
+- Length: 1–2 sentences max. 
+- Include the person's name naturally if it fits; don't force it
+- Status mode: ask a clear single question about where things stand
+- Context mode: provide the relevant update or reason for reaching out, optionally nudge for a next step
+
+**Output format:**
+```
+**To: [Name]**
+**Re: [follow-up item summary]**
+**Mode: [Status / Context]**
+
+[crafted message — paste-ready]
+```
+
+If item number is out of range or no match found, list the open follow-ups and ask which one to craft for.
+
+---
+
 ## Key behaviors
 - **Append/merge only** — never overwrite existing content.
 - **Show a summary after every write** — not just "done."
