@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """
-init_db.py — Apply schema + pending migrations, then rewrite the Schema Reference
-in SKILL.md so the agent's knowledge stays current.
+init_db.py — Apply schema + pending migrations, then rewrite:
+  - Schema Reference in SKILL.md
+  - Tables section in CLAUDE.md (if present)
 
 Usage:
     python3 init_db.py                  # use default DB_PATH
@@ -21,6 +22,7 @@ DB_PATH        = pathlib.Path(os.environ.get(
     os.path.expanduser("~/.local/share/myapp/store.db")
 ))
 SKILL_PATH     = pathlib.Path("SKILL.md")
+CLAUDE_PATH    = pathlib.Path("CLAUDE.md")
 
 # ── 1. Connect ────────────────────────────────────────────────────────────
 DB_PATH.parent.mkdir(parents=True, exist_ok=True)
@@ -115,5 +117,36 @@ if SKILL_PATH.exists():
     )
     SKILL_PATH.write_text(skill)
     print(f"✓ Skill updated: {SKILL_PATH}")
+
+# ── 8. Regenerate CLAUDE.md tables section (if present) ──────────────────
+if CLAUDE_PATH.exists():
+    conn2 = sqlite3.connect(DB_PATH)
+    conn2.row_factory = sqlite3.Row
+    real_tables = conn2.execute(
+        "SELECT name FROM sqlite_master WHERE type='table' "
+        "AND name NOT LIKE '%_fts%' AND name NOT LIKE 'sqlite_%' "
+        "AND name != '_migrations' ORDER BY name"
+    ).fetchall()
+    table_lines = [
+        "## Tables\n\n",
+        "<!-- AUTO-GENERATED — run python3 init_db.py to refresh -->\n\n",
+    ]
+    for (table,) in real_tables:
+        cols = conn2.execute(f"PRAGMA table_info({table})").fetchall()
+        col_names = ", ".join(
+            f"`{c[1]}`" for c in cols
+            if c[1] not in ("created_at", "updated_at", "deleted_at")
+        )
+        table_lines.append(f"- **`{table}`** — {col_names}\n")
+    conn2.close()
+    claude = CLAUDE_PATH.read_text()
+    claude = re.sub(
+        r"## Tables\n.*?(?=\n## )",
+        "".join(table_lines),
+        claude,
+        flags=re.DOTALL
+    )
+    CLAUDE_PATH.write_text(claude)
+    print(f"✓ CLAUDE.md updated: {CLAUDE_PATH}")
 
 print(f"✓ DB ready:      {DB_PATH}")
