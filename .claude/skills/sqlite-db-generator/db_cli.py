@@ -6,19 +6,21 @@ Usage:
     python3 db_cli.py <command> '<json args>'
     python3 db_cli.py context '{}'
     python3 db_cli.py schema '{}'
-    python3 db_cli.py recent-orders '{"limit":5,"status":"pending"}'
+    python3 db_cli.py list-orders '{"limit":5,"status":"pending"}'
 
 All commands output JSON on stdout. Errors go to stderr with a non-zero exit code.
 
-Override the db path:
-    DB_PATH=/custom/path.db python3 db_cli.py context '{}'
+When bundled in a skill folder, DB_PATH is baked in as an absolute path.
+To override: DB_PATH=/custom/path.db python3 db_cli.py context '{}'
 """
 import sys, json, sqlite3, os, pathlib, shutil, csv, io
 
+# <<DB_PATH_START>>
 DB_PATH = pathlib.Path(os.environ.get(
     "DB_PATH",
-    os.path.expanduser("~/.local/share/myapp/store.db")
+    str(pathlib.Path("db") / f"{pathlib.Path.cwd().name}.db")
 ))
+# <<DB_PATH_END>>
 
 def connect():
     conn = sqlite3.connect(DB_PATH)

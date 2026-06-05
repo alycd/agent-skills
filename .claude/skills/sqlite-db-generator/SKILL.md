@@ -26,23 +26,50 @@ parsing required.
 
 ## File Layout
 
+### Local scope (default) — DB belongs to a specific project
+
 ```
 <project>/
-├── schema.sql              ← source of truth; edit this to change the db structure
-├── migrations/             ← versioned .sql files for schema changes after initial deploy
+├── schema.sql                          ← source of truth; edit this to change the db
+├── migrations/                         ← versioned .sql files for post-deploy changes
 │   └── 001_initial.sql
 ├── scripts/
-│   ├── init_db.py          ← applies schema + pending migrations, rewrites Schema Reference
-│   └── db_cli.py           ← all read/write/admin commands the agent calls
-└── .gitignore              ← add *.db here
+│   ├── init_db.py                      ← bootstrap + sync; run after every schema change
+│   └── db_cli.py                       ← template; init_db.py bakes DB_PATH and copies it
+├── db/
+│   └── <name>.db                       ← DB lives here (add to .gitignore)
+└── .claude/skills/<name>-db/
+    ├── SKILL.md                        ← auto-generated agent skill (schema + commands)
+    └── db_cli.py                       ← baked copy with absolute DB_PATH
 ```
 
-The scripts in `scripts/` are bundled with this skill — copy them into your project as-is.
-Override `DB_PATH` via environment variable or edit the default at the top of each file:
-```bash
-DB_PATH=/my/custom/path.db python3 scripts/init_db.py
-DB_PATH=/my/custom/path.db python3 scripts/db_cli.py context '{}'
+### Global scope — personal DB usable from any project
+
+Everything lives together in one folder; **nothing is written to the current project directory**.
+
 ```
+~/db/<name>/
+├── <name>.db                           ← the database
+├── schema.sql                          ← source of truth
+├── init_db.py                          ← run from anywhere: python3 ~/db/<name>/init_db.py
+├── db_cli.py                           ← template; init_db.py bakes DB_PATH and copies it
+└── migrations/
+    └── 001_initial.sql
+
+~/.claude/skills/<name>-db/
+├── SKILL.md                            ← auto-generated agent skill (schema + commands)
+└── db_cli.py                           ← baked copy with absolute DB_PATH
+```
+
+`init_db.py` copies `db_cli.py` into the skill folder at first run with `DB_PATH` hardcoded
+to the absolute path — so the agent can call it from any working directory.
+
+Scope options (set at the top of `init_db.py`):
+
+| `DB_SCOPE` | DB + artifacts location | Skill location | Use when |
+|---|---|---|---|
+| `local` (default) | `<project>/db/<name>.db` + `scripts/`, `migrations/` in project root | `.claude/skills/<name>-db/` | DB belongs to this project |
+| `global` | `~/db/<name>/` (DB, schema, migrations, scripts all here) | `~/.claude/skills/<name>-db/` | Personal DB used across projects |
 
 ---
 
@@ -143,32 +170,27 @@ Ask:
 
 *Use answers to plan indexes beyond the primary key.*
 
-### 1.6 — Storage location
+### 1.6 — Storage scope
 
 Ask:
-- Where do you want the `.db` file to live? Options:
-  1. **Project-local** — `./<projectname>.db` next to your code. Travels with the repo, easy to
-     find, easy to delete. Add to `.gitignore` if it contains real data.
-  2. **User data directory** — `~/.local/share/<appname>/store.db` (Linux/macOS). Survives
-     project moves; good for persistent user state like a CLI tool's history.
-  3. **Temp / scratch** — `/tmp/<name>.db`. Wiped on reboot; good for throwaway experiments.
-  4. **Download** — generate the `.db` file and offer it as a download. Good for one-off exports
-     or sandboxed environments where filesystem navigation is awkward.
-  5. **Custom path** — user specifies an exact path.
+- Will this DB be used only inside this project, or do you want it accessible from any project
+  (or by a webapp running independently)?
 
-*Set `DB_PATH` in both `init_db.py` and `db_cli.py` before generating any code.*
+**Local** (`DB_SCOPE=local`, default):
+- DB at `./db/<name>.db` — travels with the project, easy to gitignore
+- Skill at `.claude/skills/<name>-db/` — only visible inside this project
+- Best for: a DB that belongs to a specific codebase
 
-**Flag if they say:** "share it", "send it to me", "export it", "download it" — all mean option 4.
+**Global** (`DB_SCOPE=global`):
+- Everything at `~/db/<name>/` — DB, schema.sql, migrations/, init_db.py all in one folder; nothing written to the project directory
+- Skill at `~/.claude/skills/<name>-db/` — visible from every project
+- Best for: personal tools (second brain, bug tracker, link vault)
 
-**Download support (add to db_cli.py when chosen):**
-```python
-def db_export(dest=None):
-    import shutil
-    out = pathlib.Path(dest) if dest else pathlib.Path.cwd() / DB_PATH.name
-    shutil.copy2(DB_PATH, out)
-    # If present_files tool is available, call it here to surface a download link
-    return {"exported_to": str(out)}
-```
+**Webapp access:** In both scopes, webapps connect directly to the `.db` file path —
+no API layer needed. The generated skill documents the path and driver snippets.
+
+**Flag if they say:** "share it", "export it", "download it" — use `db-export` command
+in db_cli.py which copies the `.db` file itself. Add `present_files` call if available.
 
 ### 1.7 — Design confirmation
 
@@ -321,15 +343,62 @@ Each file is append-only — never edit a migration that has already run.
 ### Running the sync
 
 ```bash
-python3 scripts/init_db.py
+python3 init_db.py          # global scope
+python3 scripts/init_db.py  # local scope
 ```
 
 This does three things in one shot:
 1. Creates the `_migrations` tracking table if it doesn't exist.
-2. Applies `schema.sql` (first run only) or any pending `migrations/*.sql` files.
-3. Rewrites the **Schema Reference** section of this `SKILL.md` with the live column structure.
+2. Applies pending `migrations/*.sql` files in order.
+3. Rewrites the **Schema Reference** section of the generated `SKILL.md` with the live column structure.
 
-See `scripts/init_db.py` for the full implementation — it is the bundled source of truth.
+### Self-check after every migration — REQUIRED
+
+`init_db.py` updates the DB and the Schema Reference. It does **not** update `db_cli.py` or `schema.sql`.
+After every migration you MUST do all of the following, then re-run `init_db.py` to rebake the skill copy.
+
+**Always — update `schema.sql` to match the new state:**
+
+`schema.sql` is the source of truth for the complete current schema. Every migration must be reflected back into it so the file always represents what a fresh deploy would look like.
+
+- [ ] For every `ALTER TABLE ... ADD COLUMN`: add the column to the matching `CREATE TABLE` block in `schema.sql`
+- [ ] For every column removed or renamed: update the `CREATE TABLE` block in `schema.sql` accordingly
+- [ ] For every new table: add the full `CREATE TABLE` + triggers + indexes to `schema.sql`
+
+Work through this checklist for `db_cli.py`:
+
+**For every new column added:**
+
+- [ ] `cmd_insert_<entity>` — add the column as an optional arg; include it in the INSERT cols/vals if present
+- [ ] `cmd_update_<entity>` — add `if "col" in args: fields["col"] = args["col"]` and update the error message listing updatable fields
+- [ ] `cmd_list_<entity>` — if the column is filterable (status, type, badge number), add a `if col: conditions.append(...)` branch
+- [ ] `cmd_get_<entity>` — usually no change needed (uses `SELECT *`)
+- [ ] Returned JSON in insert/update — include the new column in the `ok({...})` response so callers see it
+
+**For every column removed or renamed:**
+
+- [ ] Remove or rename all references in insert, update, list, and any named-query commands
+- [ ] Check `bulk-import` / `bulk-export` — they use column names from the caller; document the change
+
+**For every new table added:**
+
+- [ ] Add a full set of CRUD commands: `insert-<entity>`, `get-<entity>`, `list-<entity>`, `update-<entity>`
+- [ ] Add the table to `cmd_context` if it needs a live/total row count
+- [ ] Add the table name to the `COMMANDS` dispatch dict
+- [ ] Update the `## Command Reference` table in the generated SKILL.md
+
+**After updating db_cli.py, re-run init_db.py** to copy the updated template into the skill folder:
+
+```bash
+python3 init_db.py   # rebakes ~/.claude/skills/<name>-db/db_cli.py
+```
+
+Then verify end-to-end with a quick smoke test:
+
+```bash
+python3 ~/.claude/skills/<name>-db/db_cli.py insert-<entity> '{"new_col":"value",...}'
+python3 ~/.claude/skills/<name>-db/db_cli.py update-<entity> '{"id":1,"new_col":"value"}'
+```
 
 
 
@@ -439,14 +508,44 @@ Phase 1 so it never drifts between the two files.
 
 ```
 Edit schema.sql  (or add migrations/<N>_change.sql for existing dbs)
-      ↓
-python3 init_db.py
-      ↓
-db file updated  +  Schema Reference in this SKILL.md rewritten
-      ↓
-Agent reads updated skill → knows exactly what tables/columns/indexes exist
-      ↓
-Other skills call: python3 db_cli.py context '{}'  →  self-describing JSON entry point
+        ↓
+python3 scripts/init_db.py
+        ↓
+  db/<name>.db updated
+  .claude/skills/<name>-db/SKILL.md  ← Schema Reference section spliced
+  .claude/skills/<name>-db/db_cli.py ← re-copied with absolute DB_PATH
+        ↓
+Agent loads <name>-db skill → knows exact tables/columns/indexes
+        ↓
+Other skills call:  python3 .claude/skills/<name>-db/db_cli.py context '{}'
+Webapps connect to: db/<name>.db directly
 ```
 
 No manual skill edits. No schema inspection at runtime. One command keeps everything in sync.
+
+---
+
+## Phase 5 — The Generated Skill
+
+After the first `python3 scripts/init_db.py` run, a self-contained skill is written to
+`.claude/skills/<name>-db/` (or `~/.claude/skills/<name>-db/` for global scope).
+
+**What it contains:**
+- Frontmatter `name` and `description` tailored to the DB's entity names so it activates
+  on phrases like "add a bug", "list orders", "search bugtracker"
+- DB path and CLI reference (absolute, works from any directory)
+- Schema Reference — the only section that changes after migrations
+- Full command reference with entity-specific examples
+- Webapp access snippets (Python / Node / Bun+Drizzle)
+- Migration instructions
+
+**What gets re-generated on every `init_db.py` run:**
+- `db_cli.py` in the skill folder (in case source changed)
+- The `## Schema Reference` section in `SKILL.md` only — everything else is stable
+
+**What to set before generating:**
+- `DB_SCOPE` — `local` (default) or `global`
+- `DB_NAME` — defaults to the current directory name; override if different
+- Entity names in the description — `init_db.py` derives them from the first table name;
+  edit the generated skill's frontmatter `description` if the auto-derived name is wrong
+  (e.g. "goose" → "geese", "person" → "people")
