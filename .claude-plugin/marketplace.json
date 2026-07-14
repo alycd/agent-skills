@@ -15,7 +15,7 @@
         "source": "url",
         "url": "https://github.com/alycd/agent-skills.git"
       },
-      "description": "Agent Skills bundle: Draw.io diagram builder + Skill Writer for Claude Code. Create professional architecture diagrams and author custom skills.",
+      "description": "Agent Skills bundle: Draw.io diagram builder, Skill Writer, and Ontoly Software Graph Analysis for Claude Code.",
       "version": "1.0.0",
       "strict": true
     }

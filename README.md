@@ -1,7 +1,7 @@
 # Agent Skills Marketplace
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Skills: 2](https://img.shields.io/badge/Skills-2-blue.svg)](./CATALOG.md)
+[![Skills: 3](https://img.shields.io/badge/Skills-3-blue.svg)](./CATALOG.md)
 
 A curated marketplace of professional Agent Skills for Claude Code. Install skills to enhance Claude's capabilities with specialized knowledge, workflows, and tools.
 
@@ -16,6 +16,11 @@ Create professional architecture diagrams, flowcharts, and network diagrams with
 Guide for creating high-quality Agent Skills with validation, best practices, and testing workflows.
 
 **Use cases:** Creating custom skills, skill authoring, documentation
+
+### 🧭 [Software Graph Analysis](./.claude/skills/software-graph-analysis)
+Build and query Ontoly Software Graphs for deterministic codebase understanding.
+
+**Use cases:** Architecture summaries, route tracing, dependency traversal, impact analysis
 
 **[📖 Browse Full Catalog](./CATALOG.md)**
 
@@ -73,10 +78,14 @@ agent-skills/
 │       │   ├── skill.json   # Marketplace metadata
 │       │   ├── templates/   # Example files
 │       │   └── references/  # Technical docs
-│       └── skill-writer/    # Skill authoring guide
+│       ├── skill-writer/    # Skill authoring guide
+│       │   ├── SKILL.md
+│       │   ├── skill.json
+│       │   └── README.md
+│       └── software-graph-analysis/
 │           ├── SKILL.md
-│           ├── skill.json
-│           └── README.md
+│           ├── README.md
+│           └── skill.json
 ├── .claude-plugin/          # Plugin marketplace config
 │   ├── marketplace.json     # Marketplace definition (read by Claude Code)
 │   └── README.md            # Marketplace documentation
@@ -94,10 +103,12 @@ agent-skills/
 **Search by use case:**
 - Need diagrams? → [draw-io](./.claude/skills/draw-io)
 - Creating skills? → [skill-writer](./.claude/skills/skill-writer)
+- Understanding a codebase? → [software-graph-analysis](./.claude/skills/software-graph-analysis)
 
 **Filter by tags:**
 - `diagrams`, `architecture`, `aws`, `gcp` → Draw.io
 - `skill-development`, `authoring`, `documentation` → Skill Writer
+- `software-graph`, `dependency-analysis`, `impact-analysis`, `mcp` → Software Graph Analysis
 
 ## 🛠️ Using Skills
 
@@ -160,9 +171,9 @@ Use the [Skill Writer](./.claude/skills/skill-writer) to ensure quality!
 
 ## 📊 Marketplace Stats
 
-- **Total Skills:** 2
+- **Total Skills:** 3
 - **Categories:** 2 (Visualization, Development)
-- **Last Updated:** 2026-02-12
+- **Last Updated:** 2026-07-14
 - **License:** MIT
 
 ## 🚧 Roadmap
@@ -186,9 +197,10 @@ See individual skill directories for specific licensing information.
 **Most Popular:**
 1. 🎨 [Draw.io Diagram Builder](./.claude/skills/draw-io) - Professional diagram creation
 2. 🛠️ [Skill Writer](./.claude/skills/skill-writer) - Create your own skills
+3. 🧭 [Software Graph Analysis](./.claude/skills/software-graph-analysis) - Ontoly-backed codebase understanding
 
 **Recently Added:**
-- All skills (initial release!)
+- Software Graph Analysis
 
 ## 🔗 Links
 
