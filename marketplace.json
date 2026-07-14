@@ -51,6 +51,29 @@
         "Directory structure setup",
         "Testing guidance"
       ]
+    },
+    {
+      "id": "software-graph-analysis",
+      "name": "Software Graph Analysis",
+      "version": "1.0.0",
+      "description": "Build and query Ontoly Software Graphs for deterministic codebase understanding before falling back to source search.",
+      "category": "development",
+      "tags": ["software-graph", "architecture", "dependency-analysis", "impact-analysis", "mcp", "typescript"],
+      "author": "0xsarwagya",
+      "path": ".claude/skills/software-graph-analysis",
+      "install_url": "https://github.com/alycd/agent-skills/tree/main/.claude/skills/software-graph-analysis",
+      "dependencies": [],
+      "requirements": {
+        "tools": ["Read", "Bash"],
+        "external": ["ontoly"]
+      },
+      "features": [
+        "Deterministic Software Graph generation",
+        "Graph-backed architecture summaries",
+        "Route and request-flow tracing",
+        "Dependency and impact analysis",
+        "Diagnostics-aware confidence reporting"
+      ]
     }
   ],
   "categories": {
@@ -64,8 +87,8 @@
     }
   },
   "metadata": {
-    "last_updated": "2026-02-12",
-    "skill_count": 2,
+    "last_updated": "2026-07-14",
+    "skill_count": 3,
     "total_downloads": 0
   }
 }

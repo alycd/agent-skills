@@ -1,0 +1,34 @@
+{
+  "id": "software-graph-analysis",
+  "name": "Software Graph Analysis",
+  "version": "1.0.0",
+  "description": "Build and query Ontoly Software Graphs for deterministic codebase understanding before falling back to source search.",
+  "author": "0xsarwagya",
+  "license": "MIT",
+  "homepage": "https://github.com/0xsarwagya/ontoly",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/0xsarwagya/ontoly.git"
+  },
+  "category": "development",
+  "tags": [
+    "software-graph",
+    "architecture",
+    "dependency-analysis",
+    "impact-analysis",
+    "mcp",
+    "typescript"
+  ],
+  "requirements": {
+    "claude": ">=1.0.0",
+    "tools": ["Read", "Bash"],
+    "external_dependencies": ["ontoly"]
+  },
+  "features": [
+    "Deterministic Software Graph generation",
+    "Graph-backed architecture summaries",
+    "Route and request-flow tracing",
+    "Dependency and impact analysis",
+    "Diagnostics-aware confidence reporting"
+  ]
+}

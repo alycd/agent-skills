@@ -63,6 +63,33 @@ Help me create a skill for PDF processing
 
 ---
 
+#### Software Graph Analysis
+**Version:** 1.0.0 | **Author:** 0xsarwagya
+
+Build and query Ontoly Software Graphs for deterministic codebase understanding before falling back to source search.
+
+**Features:**
+- ✅ Deterministic Software Graph generation
+- ✅ Graph-backed architecture summaries
+- ✅ Route and request-flow tracing
+- ✅ Dependency and impact analysis
+- ✅ Diagnostics-aware confidence reporting
+
+**When to use:**
+- Architecture summaries and repository onboarding
+- Route tracing and request-flow analysis
+- Dependency traversal and impact analysis
+- Configuration and environment-variable usage review
+
+**Quick Example:**
+```
+Trace POST /login using the Ontoly Software Graph
+```
+
+**[📖 Documentation](./.claude/skills/software-graph-analysis/README.md)** | **[⚙️ Install](#installation)**
+
+---
+
 ## Installation
 
 ### Quick Install (Single Skill)
@@ -118,8 +145,9 @@ The skills should now be automatically available when you start Claude Code!
 ### Visualization (1)
 - [Draw.io Diagram Builder](#draw-io-diagram-builder)
 
-### Development (1)
+### Development (2)
 - [Skill Writer](#skill-writer)
+- [Software Graph Analysis](#software-graph-analysis)
 
 ## 🔍 Browse by Tag
 
@@ -133,6 +161,12 @@ The skills should now be automatically available when you start Claude Code!
 | `authoring` | Skill Writer |
 | `documentation` | Skill Writer |
 | `meta` | Skill Writer |
+| `software-graph` | Software Graph Analysis |
+| `architecture` | Software Graph Analysis |
+| `dependency-analysis` | Software Graph Analysis |
+| `impact-analysis` | Software Graph Analysis |
+| `mcp` | Software Graph Analysis |
+| `typescript` | Software Graph Analysis |
 
 ## 🆕 What's New
 
@@ -140,6 +174,9 @@ The skills should now be automatically available when you start Claude Code!
 - 🎉 Initial marketplace release
 - ✨ Added Draw.io Diagram Builder v1.0.0
 - ✨ Added Skill Writer v1.0.0
+
+**2026-07-14**
+- ✨ Added Software Graph Analysis v1.0.0
 
 ## 🤝 Contributing
 
@@ -163,6 +200,6 @@ See individual skill directories for specific license information.
 
 ## 📈 Stats
 
-- **Total Skills:** 2
+- **Total Skills:** 3
 - **Categories:** 2
 - **Last Updated:** 2026-02-12
