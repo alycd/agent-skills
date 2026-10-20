@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Wiki Knowledge Graph</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: radial-gradient(ellipse at 20% 20%, #0f1a2e 0%, #090d14 60%, #04070d 100%);
+      color: #e2eaf5;
+      font-family: 'Inter', -apple-system, sans-serif;
+      overflow: hidden;
+    }
+
+    #graph { width: 100vw; height: 100vh; }
+
+    /* ── Top Control Bar ── */
+    #controls {
+      position: fixed; top: 16px; left: 50%; transform: translateX(-50%);
+      z-index: 20; display: flex; gap: 10px; align-items: center;
+    }
+
+    #search {
+      padding: 8px 16px 8px 38px;
+      border-radius: 24px;
+      border: 1px solid rgba(99,130,175,0.35);
+      background: rgba(15,26,46,0.85);
+      backdrop-filter: blur(12px);
+      color: #e2eaf5;
+      font-size: 13px;
+      width: 240px;
+      outline: none;
+      transition: border-color .2s, box-shadow .2s;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%237a8fa8' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.35-4.35'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: 12px center;
+    }
+    #search:focus {
+      border-color: rgba(99,160,255,0.6);
+      box-shadow: 0 0 0 3px rgba(60,130,255,0.12);
+    }
+    #search::placeholder { color: #4a607a; }
+
+    #stats {
+      font-size: 11px; color: #7a8fa8; letter-spacing: .03em;
+      background: rgba(15,26,46,0.85); backdrop-filter: blur(12px);
+      border: 1px solid rgba(99,130,175,0.25);
+      border-radius: 24px; padding: 6px 14px;
+      white-space: nowrap;
+    }
+
+    /* ── Right Legend ── */
+    #legend {
+      position: fixed; top: 16px; right: 16px; z-index: 20;
+      background: rgba(10,18,32,0.88); backdrop-filter: blur(16px);
+      border: 1px solid rgba(99,130,175,0.2);
+      border-radius: 14px; padding: 14px 18px;
+    }
+    #legend h4 {
+      font-size: 10px; font-weight: 600; letter-spacing: .08em;
+      text-transform: uppercase; color: #4a607a; margin-bottom: 10px;
+    }
+    .legend-row { display: flex; align-items: center; gap: 9px; margin: 7px 0; }
+    .legend-dot {
+      width: 11px; height: 11px; border-radius: 50%;
+      box-shadow: 0 0 6px var(--c);
+      background: var(--c);
+      flex-shrink: 0;
+    }
+    .legend-label { font-size: 12px; color: #b0c0d8; font-weight: 500; }
+    .legend-sep {
+      height: 1px; background: rgba(99,130,175,0.15); margin: 8px 0;
+    }
+    .legend-edge { display: flex; align-items: center; gap: 9px; margin: 6px 0; }
+    .edge-line {
+      width: 26px; height: 2px;
+      border-radius: 2px;
+      flex-shrink: 0;
+    }
+
+    /* ── Bottom Info Panel ── */
+    #info {
+      position: fixed; bottom: -80px; left: 50%; transform: translateX(-50%);
+      min-width: 360px; max-width: 640px;
+      background: rgba(10,18,32,0.95); backdrop-filter: blur(20px);
+      border: 1px solid rgba(99,130,175,0.25);
+      border-radius: 16px 16px 0 0;
+      padding: 14px 20px 12px;
+      transition: bottom .28s cubic-bezier(.34,1.56,.64,1);
+      z-index: 30;
+    }
+    #info.visible { bottom: 0; }
+    #info-type {
+      display: inline-block; font-size: 10px; font-weight: 600;
+      letter-spacing: .07em; text-transform: uppercase;
+      padding: 2px 8px; border-radius: 6px; margin-bottom: 6px;
+    }
+    #info-title { font-size: 16px; font-weight: 600; color: #e2eaf5; }
+    #info-path { font-size: 11px; color: #4a607a; margin-top: 4px; font-family: 'Menlo', monospace; }
+    #info-degree { font-size: 11px; color: #7a8fa8; margin-top: 3px; }
+    #info-close {
+      position: absolute; top: 12px; right: 14px;
+      background: none; border: none; color: #4a607a;
+      font-size: 18px; cursor: pointer; line-height: 1;
+      transition: color .15s;
+    }
+    #info-close:hover { color: #e2eaf5; }
+
+    /* ── tooltip override ── */
+    .vis-tooltip {
+      background: rgba(10,18,32,0.95) !important;
+      border: 1px solid rgba(99,130,175,0.3) !important;
+      border-radius: 8px !important;
+      color: #e2eaf5 !important;
+      font-family: 'Inter', sans-serif !important;
+      font-size: 12px !important;
+      padding: 8px 12px !important;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.4) !important;
+    }
+  </style>
+</head>
+<body>
+  <div id="controls">
+    <input id="search" placeholder="Search nodes..." oninput="filterNodes(this.value)" autocomplete="off" spellcheck="false">
+    <div id="stats"></div>
+  </div>
+
+  <div id="legend">
+    <h4>Node Types</h4>
+    <div class="legend-row">
+      <span class="legend-dot" style="--c:#4A90D9"></span>
+      <span class="legend-label">Source</span>
+    </div>
+    <div class="legend-row">
+      <span class="legend-dot" style="--c:#E8943A"></span>
+      <span class="legend-label">Entity</span>
+    </div>
+    <div class="legend-row">
+      <span class="legend-dot" style="--c:#3DBE7A"></span>
+      <span class="legend-label">Concept</span>
+    </div>
+    <div class="legend-row">
+      <span class="legend-dot" style="--c:#A855F7"></span>
+      <span class="legend-label">Synthesis</span>
+    </div>
+    <div class="legend-sep"></div>
+    <div class="legend-edge">
+      <div class="edge-line" style="background:#4a6080"></div>
+      <span class="legend-label" style="font-size:11px;color:#7a8fa8">Explicit Link</span>
+    </div>
+    <div class="legend-edge">
+      <div class="edge-line" style="background:repeating-linear-gradient(90deg,#f6a623 0,#f6a623 4px,transparent 4px,transparent 8px)"></div>
+      <span class="legend-label" style="font-size:11px;color:#7a8fa8">Inferred Relation</span>
+    </div>
+  </div>
+
+  <div id="graph"></div>
+
+  <div id="info">
+    <button id="info-close" onclick="closeInfo()">×</button>
+    <div id="info-type"></div>
+    <div id="info-title"></div>
+    <div id="info-path"></div>
+    <div id="info-degree"></div>
+  </div>
+
+  <script>
+    const DATA = /* GRAPH_JSON_PLACEHOLDER */;
+
+    const PALETTE = {
+      source:    { bg: "#1a3a5c", border: "#4A90D9", glow: "#4A90D9" },
+      entity:    { bg: "#3d2a0a", border: "#E8943A", glow: "#E8943A" },
+      concept:   { bg: "#0d3320", border: "#3DBE7A", glow: "#3DBE7A" },
+      synthesis: { bg: "#2a1040", border: "#A855F7", glow: "#A855F7" },
+    };
+    const DEFAULT_P = { bg: "#1a2030", border: "#607090", glow: "#607090" };
+
+    const TYPE_BADGE = {
+      source:    { bg: "rgba(74,144,217,0.2)",  color: "#4A90D9"  },
+      entity:    { bg: "rgba(232,148,58,0.2)",  color: "#E8943A"  },
+      concept:   { bg: "rgba(61,190,122,0.2)",  color: "#3DBE7A"  },
+      synthesis: { bg: "rgba(168,85,247,0.2)",  color: "#A855F7"  },
+    };
+
+    /* degree map */
+    const degMap = {};
+    DATA.edges.forEach(e => {
+      degMap[e.source] = (degMap[e.source] || 0) + 1;
+      degMap[e.target] = (degMap[e.target] || 0) + 1;
+    });
+
+    /* nodes */
+    const nodesDS = new vis.DataSet(DATA.nodes.map(n => {
+      const deg  = degMap[n.id] || 0;
+      const size = Math.max(14, Math.min(52, 14 + deg * 4.5));
+      const p    = PALETTE[n.type] || DEFAULT_P;
+      return {
+        id:    n.id,
+        label: n.label,
+        size,
+        shape: "dot",
+        color: {
+          background: p.bg,
+          border:     p.border,
+          highlight:  { background: p.bg, border: "#ffffff" },
+          hover:      { background: p.bg, border: "#ffffff" },
+        },
+        borderWidth: 2,
+        borderWidthSelected: 3,
+        shadow: {
+          enabled: true,
+          color:   p.glow + "55",
+          size:    size * 0.8,
+          x: 0, y: 0,
+        },
+        font: {
+          color: "#c8d8ee",
+          size:  Math.max(11, Math.min(15, 10 + deg)),
+          face:  "Inter, -apple-system, sans-serif",
+          strokeWidth: 3,
+          strokeColor: "rgba(4,7,13,0.9)",
+          vadjust: 4,
+        },
+        title: `<div style="padding:4px 2px">
+          <b style="color:${p.border}">${n.label}</b><br>
+          <span style="color:#7a8fa8;font-size:11px">
+            ${n.type} &nbsp;·&nbsp; degree ${deg}
+          </span>
+        </div>`,
+        _type: n.type, _deg: deg,
+      };
+    }));
+
+    /* edges */
+    const edgesDS = new vis.DataSet(DATA.edges.map((e, i) => {
+      const inferred = e.type === "INFERRED";
+      return {
+        id:     i,
+        from:   e.source,
+        to:     e.target,
+        dashes: inferred ? [5, 4] : false,
+        color: {
+          color:     inferred ? "#c07820" : "#2d4a6a",
+          highlight: inferred ? "#f6a623" : "#5599cc",
+          hover:     inferred ? "#f6a623" : "#5599cc",
+          opacity:   inferred ? 0.75 : 0.65,
+        },
+        width:  inferred ? 1.2 : 1.5,
+        label:  e.label || "",
+        title:  e.confidence ? `confidence: ${e.confidence.toFixed(2)}` : undefined,
+        font:   { size: 9, color: "#4a6080", strokeWidth: 2, strokeColor: "#04070d" },
+        arrows: { to: { enabled: true, scaleFactor: 0.55, type: "arrow" } },
+        smooth: { type: "curvedCW", roundness: 0.15 },
+      };
+    }));
+
+    document.getElementById("stats").textContent =
+      `${DATA.nodes.length} nodes  ·  ${DATA.edges.length} edges  ·  ${DATA.build_date}`;
+
+    const container = document.getElementById("graph");
+    const network = new vis.Network(container, { nodes: nodesDS, edges: edgesDS }, {
+      physics: {
+        enabled: true,
+        solver: "forceAtlas2Based",
+        forceAtlas2Based: {
+          gravitationalConstant: -55,
+          centralGravity: 0.008,
+          springLength: 160,
+          springConstant: 0.06,
+          damping: 0.42,
+          avoidOverlap: 0.8,
+        },
+        stabilization: { iterations: 400, updateInterval: 25 },
+      },
+      interaction: {
+        hover: true,
+        tooltipDelay: 60,
+        multiselect: false,
+        zoomView: true,
+        dragView: true,
+      },
+      nodes: { chosen: true },
+    });
+
+    /* Disable physics after stabilization */
+    network.on("stabilizationIterationsDone", () => {
+      network.setOptions({ physics: { enabled: false } });
+    });
+
+    /* Node click handler */
+    network.on("click", params => {
+      if (params.nodes.length) {
+        const n = DATA.nodes.find(x => x.id === params.nodes[0]);
+        const badge = TYPE_BADGE[n.type] || { bg: "#1a2030", color: "#7a8fa8" };
+        const deg   = degMap[n.id] || 0;
+        document.getElementById("info-type").textContent  = n.type.toUpperCase();
+        document.getElementById("info-type").style.background = badge.bg;
+        document.getElementById("info-type").style.color      = badge.color;
+        document.getElementById("info-title").textContent = n.label;
+        document.getElementById("info-path").textContent  = n.id;
+        document.getElementById("info-degree").textContent = `Connections: ${deg}`;
+        document.getElementById("info").classList.add("visible");
+      }
+    });
+
+    function closeInfo() {
+      document.getElementById("info").classList.remove("visible");
+    }
+
+    /* Search highlight */
+    function filterNodes(q) {
+      const lower = q.toLowerCase();
+      nodesDS.update(DATA.nodes.map(n => ({
+        id:      n.id,
+        opacity: !q || n.label.toLowerCase().includes(lower) ? 1 : 0.12,
+      })));
+    }
+  </script>
+</body>
+</html>

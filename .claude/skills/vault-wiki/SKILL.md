@@ -7,10 +7,6 @@ description: >
   multi-workspace config — WIKI_ROOT is always wiki/ in this vault.
   Activates when the user says "ingest <file>", "wiki-ingest", "wiki ingest", "add this to the wiki",
   "wiki-query:", "wiki query:", "wiki-lint", "wiki lint", or "check the wiki".
-  IMPORTANT: this project also has a global "llm-wiki" skill installed. Whenever the current working
-  directory is inside this vault (Naqi), THIS skill takes precedence over llm-wiki for every one of
-  these trigger phrases — llm-wiki's workspace is a different, unrelated folder
-  (~/Documents/llm-wiki) and should not be used here.
 ---
 
 # Vault Wiki
