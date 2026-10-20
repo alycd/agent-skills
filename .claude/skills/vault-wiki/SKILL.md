@@ -3,7 +3,7 @@ name: vault-wiki
 description: >
   Lightweight wiki skill scoped to this vault's wiki/ folder. Ingests documents (PDF, DOCX, PPTX,
   XLSX, Markdown, images) into structured source/entity/concept pages, keeps wiki/index.md current,
-  and answers questions against the wiki. No graph building (use the graphify skill for that) and no
+  and answers questions against the wiki using local BM25 search (SQLite FTS5, scripts/). No graph building (use the graphify skill for that) and no
   multi-workspace config — WIKI_ROOT is always wiki/ in this vault.
   Activates when the user says "ingest <file>", "wiki-ingest", "wiki ingest", "add this to the wiki",
   "wiki-query:", "wiki query:", "wiki-lint", "wiki lint", or "check the wiki".
@@ -15,7 +15,7 @@ description: >
 
 # Vault Wiki
 
-A trimmed fork of llm-wiki: LLM writes and maintains the wiki, humans read and ask questions. `WIKI_ROOT` is always `wiki/` at the vault root — never prompt for or infer another path. No graph builder (use `graphify`). Lint is deterministic-only.
+A trimmed fork of llm-wiki: LLM writes and maintains the wiki, humans read and ask questions. `WIKI_ROOT` is always `wiki/` at the vault root — never prompt for or infer another path. No graph builder (use `graphify`). Lint is deterministic-only. Search, lint and dedup run as scripts (see **Scripts**) so they stay fast and token-cheap as the wiki grows.
 
 ## Directory Structure
 
@@ -30,6 +30,8 @@ wiki/
   concepts/                 # Frameworks / methodologies / technical concepts
   syntheses/                # Saved wiki-query answers
   archive/                  # Superseded pages
+  .search/index.sqlite      # Search index (generated, safe to delete; rebuilds itself)
+  .manifest.json            # Ingest dedup: filename -> content hash + slug
 ```
 
 Pre-existing loose notes in `wiki/` are left exactly as-is — this skill only manages `index.md`, `overview.md`, `log.md` and the subfolders above. If `wiki/index.md` doesn't exist, create the skeleton (the three files and five subfolders) first.
@@ -59,6 +61,18 @@ Pages link with `[[PageName]]`. Same folder: `[[ArticleName]]`. Cross-folder: `[
 | `ingest <path> [--topic <slug>]` / "add this to the wiki" | [references/ingest.md](references/ingest.md) — Read it first |
 | `wiki lint` / "check the wiki" | [references/lint.md](references/lint.md) — Read it first |
 
+## Scripts
+
+Run from the vault root with `python3`. Stdlib only; each syncs/locates `wiki/` itself.
+
+| Script | Use |
+|---|---|
+| `.claude/skills/vault-wiki/scripts/wiki_search.py "<terms>" [-k 8]` | Ranked search: prints `path:start-end § heading` + snippet per hit. Paths are relative to `wiki/`. |
+| `.claude/skills/vault-wiki/scripts/wiki_lint.py` | Deterministic lint report |
+| `.claude/skills/vault-wiki/scripts/wiki_manifest.py check\|add\|rebuild` | Ingest dedup by content hash |
+
+`wiki_search.py` is fully local: BM25 over an SQLite FTS5 index (title, heading, tags/aliases, body; stemmed, prefix-matched, alias-expanded from `index.md`). No network, no models. It matches words, not meaning, so add synonyms to the `## Aliases` table when a query misses. The index re-syncs changed pages on every call. If `python3` fails, fall back to grep.
+
 ---
 
 ## Query Workflow
@@ -81,26 +95,29 @@ Answer ONLY from pages under `wiki/` (sources/, entities/, concepts/, syntheses/
 ### Steps
 
 1. If `wiki/index.md` doesn't exist or has no entries, tell the user to `ingest` something first. Stop.
-2. Read `wiki/index.md`, then also grep `wiki/concepts/`, `wiki/entities/`, `wiki/syntheses/`,
-   `wiki/sources/` and `wiki/overview.md` for the question's key terms (index may lag behind pages).
-   Expand each term with its synonyms from the `## Aliases` table in `wiki/index.md` and search all of them.
-3. If zero relevant pages are found → give the "Not in the wiki" reply and stop (no save prompt).
+2. Run `wiki_search.py "<question key terms>" -k 10`. Pass the distinctive nouns, names and part
+   numbers, not the whole sentence. Aliases are expanded automatically. Run a second search with
+   different wording if the first misses part of the question. Do not read `wiki/index.md` for this
+   step. (No Python → fall back to grepping the managed folders for the terms + their aliases.)
+3. If the search returns no matches, or none of the hits relate to the question → give the
+   "Not in the wiki" reply and stop (no save prompt).
 4. Read pages in layers, max 10 pages total across all layers:
    a. **Synthesized layer first** — matching `concepts/`, `entities/` and `syntheses/` pages.
       These already combine several sources, so they usually answer the question directly.
    b. **Follow links one hop** — from those pages, collect the `[[wikilinks]]` and frontmatter
       `sources:` slugs that bear on the question, and read those `sources/` pages for detail and
       exact figures. Do not follow links from pages reached this way (one hop only).
-   c. **Direct source matches** — read any remaining `sources/` pages from step 2 not already read.
+   c. **Direct source matches** — read any remaining `sources/` hits from step 2 not already read.
    If the cap is reached, prefer pages most specific to the question and note any skipped
    candidates under `## Not covered by the wiki`.
 
    **Reading rules** (always apply):
-   - **Rank before reading:** within each layer, order candidates by match count
-     (`grep -c` on the terms + aliases) and read highest first.
-   - **Read the matching section, not the whole page:** for pages over ~150 lines, read
-     ~40 lines around each grep hit (Read with `offset`/`limit`). Read the full page if the
-     section doesn't fully answer, or the claim depends on surrounding context.
+   - **Rank before reading:** within each layer, read in search-result order (highest first).
+   - **Read the matching section, not the whole page:** read the hit's line range
+     (Read with `offset`=start, `limit`=end-start+1, path `wiki/<path>`). Read the full page if the
+     section doesn't fully answer, or the claim depends on surrounding context. One-hop pages
+     from 4b have no line range: run `wiki_search.py` with the question terms to find their
+     section, or read them whole if short.
    - **Stop when answered:** the 10-page cap is a ceiling, not a target. Stop once every part
      of the question is answered with citations — but before stating an exact figure or quote,
      always read the `sources/` page it comes from (step 4b), even if a concept page already

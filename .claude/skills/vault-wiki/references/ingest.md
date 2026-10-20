@@ -30,7 +30,14 @@ If `ingest` is invoked with no path, treat `wiki/original_sources/` as the inbox
 
 ### Step 0 — Dedup Check
 
-Read `wiki/log.md`. If an `ingest` entry already exists for this filename, ask the user whether to force re-ingest; otherwise skip.
+Run `python3 .claude/skills/vault-wiki/scripts/wiki_manifest.py check "<path>"`:
+
+- `new` → continue.
+- `changed` → same filename, edited content: tell the user and re-ingest (overwrites the existing source page).
+- `same` → already ingested: ask the user whether to force re-ingest; otherwise skip.
+- `duplicate-of <file>` → identical content already ingested under another name: tell the user and skip unless they insist.
+
+If the manifest doesn't exist yet, run `wiki_manifest.py rebuild` once first. If Python is unavailable, fall back to matching the filename against `ingest` entries in `wiki/log.md`.
 
 ### Step 1 — Original-Copy Rule
 
@@ -55,13 +62,18 @@ Unify to Markdown with heading hierarchy preserved.
 ### Step 3 — Wiki Write
 
 1. Read `wiki/index.md` (and `wiki/overview.md` if it has content) for context.
-2. Read the 2-3 most relevant existing source pages for cross-reference context (skip reading the full corpus — this is what keeps ingest fast).
+2. Find related pages: run `wiki_search.py "<5-10 key names, part numbers and concepts from the document>" -k 8`,
+   then read the hit sections of the 2-3 most relevant pages for cross-reference context (skip reading the
+   full corpus — this is what keeps ingest fast). Entity/concept hits tell you which pages to update in step 5
+   instead of creating duplicates.
 3. Write `wiki/sources/<slug>.md` per the Source Page template.
 4. Update `wiki/index.md` — append entry under the matching topic section (create the section if new).
 5. Create/update relevant pages under `wiki/entities/` and `wiki/concepts/` — only for entities/concepts that are central to this document, not every passing mention.
 6. **`overview.md`**: update only if this source meaningfully changes the cross-source synthesis (e.g. a new major topic, a correction to prior understanding). Routine/incremental ingests should skip this step entirely — note in the output summary that it was skipped.
 7. If this source conflicts with an existing page's claims, annotate the conflict in that page's `## Contradictions` section before deciding whether to also update its body.
-8. Append to `wiki/log.md`: `## [YYYY-MM-DD] ingest | <Title>`
+8. Append to `wiki/log.md`: `## [YYYY-MM-DD] ingest | <Title>`, then record the ingest:
+   `wiki_manifest.py add "<original path>" <slug>` (the vault copy if one was made in Step 1).
+   The search index picks up the new pages on its next run; no rebuild needed.
 9. Output a short summary: pages created, pages updated, contradictions found, whether overview.md was touched.
 
 ## Notes
@@ -87,7 +99,8 @@ Unify to Markdown with heading hierarchy preserved.
 Archive is a snapshot — it does not update after archiving.
 
 **Interruption recovery** — `wiki/log.md` is the source of truth:
-- Log has an `ingest` entry for the file → completed normally
+- Log has an `ingest` entry and the manifest has the file → completed normally
+- Log entry but no manifest entry → interrupted after logging; run `wiki_manifest.py add`
 - `wiki/sources/<slug>.md` exists, no log entry → interrupted before logging; re-run `ingest <path>`
 - Neither exists → never started or failed early
 

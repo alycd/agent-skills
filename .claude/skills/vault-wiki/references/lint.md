@@ -8,6 +8,14 @@ Fast, no-LLM-pass health check for `wiki/`. Grep/Read only — no semantic analy
 
 None. If `wiki/index.md` doesn't exist or has no entries, say so and stop (nothing to lint yet).
 
+## Run
+
+```bash
+python3 .claude/skills/vault-wiki/scripts/wiki_lint.py
+```
+
+The script does checks 1-3 exactly. Check 4 is a heuristic candidate list (capitalised names in 3+ source pages, minus words also used in lowercase and names that already have a page or alias). Review it: keep real people/companies/products, drop generic acronyms and part numbers that belong on a concept page. If Python is unavailable, do the checks by hand with Grep/Read.
+
 ## Checks
 
 1. **Orphaned pages** — pages under `sources/`, `entities/`, `concepts/`, `syntheses/` not referenced by any `[[wikilink]]` from another page, and not listed in `index.md`.
